@@ -36,4 +36,5 @@ console.log('\n\n**********\nQuestion 2\n**********');
 console.log("Expected: 6, Actual:", addNums1([1, 2, 3]));
 console.log("Expected: 221, Actual:", addNums1([1, 4, 77, 12, 88, 33, 6]));
 
+
 //Q3. Your code here:
