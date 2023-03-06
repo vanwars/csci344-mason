@@ -1,5 +1,6 @@
 import {getAccessToken} from './utilities.js';
 const rootURL = 'https://photo-app-secured.herokuapp.com';
+let token;
 let allPosts;
 
 const profileToHTML = (profile) => {
@@ -7,7 +8,7 @@ const profileToHTML = (profile) => {
             <h1>${profile.username}</h1>`
 }
 
-const showProfile = async (token) => {
+const showProfile = async () => {
     const endpoint = `${rootURL}/api/profile`;
     const response = await fetch(endpoint, {
         headers: {
@@ -17,7 +18,6 @@ const showProfile = async (token) => {
     })
     const data = await response.json();
     document.querySelector('#user').innerHTML = profileToHTML(data);
-    console.log('Profile:', data);
 }
 
 const suggestionsToHTML = (suggested) => {
@@ -31,7 +31,7 @@ const suggestionsToHTML = (suggested) => {
             </section>`
 }
 
-const showSuggested = async (token) => {
+const showSuggested = async () => {
     const endpoint = `${rootURL}/api/suggestions`;
     const response = await fetch(endpoint, {
         headers: {
@@ -42,7 +42,6 @@ const showSuggested = async (token) => {
     const data = await response.json();
     const htmlChunk = data.map(suggestionsToHTML).join('');
     document.querySelector('#suggestedusers').innerHTML = htmlChunk;
-    console.log('Suggestions:', data);
 }
 
 const storyToHTML = (story) => {
@@ -52,7 +51,7 @@ const storyToHTML = (story) => {
             </ul>`
 }
 
-const showStories = async (token) => {
+const showStories = async () => {
     const endpoint = `${rootURL}/api/stories`;
     const response = await fetch(endpoint, {
         headers: {
@@ -63,7 +62,6 @@ const showStories = async (token) => {
     const data = await response.json();
     const htmlChunk = data.map(storyToHTML).join('');
     document.querySelector('#storiespanel').innerHTML = htmlChunk;
-    console.log('Stories:', data);
 }
 
 const modalElement = document.querySelector('.modal-bg');
@@ -125,17 +123,21 @@ const commentDisplay = (comment, i) => {
 }
 
 const postToHTML = (post, i) => {
-    return `<article class="post">
+    return `<article id="post_${post.id}" class="post">
             <section class="posttop">
                 <h1>${post.user.username}</h1>
                 <i class="fas fa-ellipsis-h"></i>
             </section>
             <img src="${post.image_url}" alt="">
             <section class="iconsrow">
-                <button class="buttons"><i class="${post.current_user_like_id ? 'far fa-heart' : 'fas fa-heart'}"></i></button>
-                <button class="buttons"><i class="far fa-comment"></i></button>
-                <button class="buttons"><i class="far fa-paper-plane"></i></button>
-                <button class="buttons"><i class="${post.current_user_bookmark_id ? 'far fa-bookmark' : 'fas fa-bookmark'}"></i></button>
+                <section id="left">
+                    <button class="buttons" onclick="${post.current_user_like_id ? deleteLike(post) : postLike(post)}"><i class="${post.current_user_like_id ? 'fas fa-heart' : 'far fa-heart'}"></i></button>
+                    <button class="buttons"><i class="far fa-comment"></i></button>
+                    <button class="buttons"><i class="far fa-paper-plane"></i></button>
+                </section
+                <section id="right">
+                <button class="buttons"><i class="${post.current_user_bookmark_id ? 'fas fa-bookmark' : 'far fa-bookmark'}"></i></button>
+                </section>
             </section>
             <span class="likesrow">${post.likes.length} likes</span>
             <section class="capcom">
@@ -153,7 +155,7 @@ const postToHTML = (post, i) => {
             </article>`
 }
 
-const showPosts = async (token) => {
+const showPosts = async () => {
     const endpoint = `${rootURL}/api/posts`;
     const response = await fetch(endpoint, {
         headers: {
@@ -163,19 +165,71 @@ const showPosts = async (token) => {
     })
     const data = await response.json();
     allPosts = data;
+    console.log(data);
     const htmlChunk = data.map(postToHTML).join('');
     document.querySelector('#posts').innerHTML = htmlChunk;
-    console.log('Posts:', data);
+}
+
+/* Page Functionality */
+const targetElementAndReplace = (selector, newHTML) => { 
+	const div = document.createElement('div'); 
+	div.innerHTML = newHTML;
+	const newEl = div.firstElementChild; 
+    const oldEl = document.querySelector(selector);
+    oldEl.parentElement.replaceChild(newEl, oldEl);
+}
+
+const requeryRedraw = async (postId) => {
+    const endpoint = `${rootURL}/api/posts/${postId}`;
+    const response = await fetch(endpoint, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        }
+    })
+    const data = await response.json(); 
+    const htmlString = postToHTML(data);
+    targetElementAndReplace(`#post_${postId}`, htmlString);
+}
+
+window.postLike = async (post) => {
+    const endpoint = `${rootURL}/api/posts/likes/`;
+    const postData = {
+        'post_id': post.id
+    };
+    const repsonse = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(postData)
+    })
+    const data = await repsonse.json();
+    requeryRedraw(post.id);
+}
+
+window.deleteLike = async (post) => {
+    const endpoint = `${rootURL}/api/posts/likes/${post.current_user_like_id}`;
+    const response = await fetch(endpoint, {
+        method: "DELETE",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        }
+    })
+    const data = await response.json();
+    requeryRedraw(post.id);
 }
 
 const initPage = async () => {
     // first log in (we will build on this after Spring Break):
-    const token = await getAccessToken(rootURL, 'webdev', 'password');
+    token = await getAccessToken(rootURL, 'mason', 'mason_password');
 
     // then use the access token provided to access data on the user's behalf
-    showProfile(token);
-    showSuggested(token);
-    showStories(token);
-    showPosts(token);
+    showProfile();
+    showSuggested();
+    showStories();
+    showPosts();
 }
 initPage();

@@ -16,20 +16,21 @@
             <section class="form">
                 <div>
                     <label for="location">Location:</label> 
-                    <input type="text" id="location" placeholder="location">
+                    <input type="text" id="location" placeholder="location" value="">
                 </div>
                 <div>
                     <label for="term">Search Term:</label> 
-                    <input type="text" id="term" placeholder="search term"> 
+                    <input type="text" id="term" placeholder="search term" value=""> 
                 </div>
-                <button onclick="search()">Search</button>
+                <button id="search">Search</button>
             </section>
     
         </div>
     </header>
 
-    <main id="results">
-       
+    <main>
+        <ul id="nav"></ul>
+        <div id="results"></div>
     </main>
 </body>
 </html>

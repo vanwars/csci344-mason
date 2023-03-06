@@ -91,3 +91,74 @@ const restaurants = [
 // Assume that you don't know in advance how many items 
 // will be in the array. In other words, your code should
 // generalize to any array of restaurant objects.
+
+/*for (let restaurant of restaurants) {
+  restaurant.index = restaurants.indexOf(restaurant);
+}*/
+
+const numOfRestaurants = restaurants.length;
+const results = document.querySelector('#results');
+results.innerHTML = `<p>Showing 0 of ${numOfRestaurants}</p>
+<p>${restaurants[0].name}</p>
+<p>${restaurants[0].display_address}</p>
+<img src="${restaurants[0].image_url}" alt="restaurant's image">`;
+
+let currentResult = 0;
+let lastResult = restaurants.length - 1;
+const prevResult = () => {
+  currentResult = (currentResult == 0) ? lastResult : currentResult - 1;
+  results.innerHTML = `<p>Showing ${currentResult} of ${numOfRestaurants}</p>
+  <p>${restaurants[currentResult].name}</p>
+  <p>${restaurants[currentResult].display_address}</p>
+  <img src="${restaurants[currentResult].image_url}" alt="restaurant's image">`;
+}
+const nextResult = () => {
+  console.log(currentResult);
+  currentResult = (currentResult == lastResult) ? 0 : currentResult + 1;
+  console.log(currentResult);
+  results.innerHTML = `<p>Showing ${currentResult} of ${numOfRestaurants}</p>
+  <p>${restaurants[currentResult].name}</p>
+  <p>${restaurants[currentResult].display_address}</p>
+  <img src="${restaurants[currentResult].image_url}" alt="restaurant's image">`;
+  console.log((currentResult + 1));
+}
+const prev = document.querySelector('#prev');
+const next = document.querySelector('#next');
+prev.addEventListener('click', prevResult);
+next.addEventListener('click', nextResult);
+
+const cardFont = document.querySelectorAll('#results > p');
+const toRegFont = () => {
+  cardFont.forEach(font => {
+    font.className = 'reg-font';
+  })
+}
+const toLarFont = () => {
+  cardFont.forEach(font => {
+    font.className = 'lar-font';
+  })
+}
+const regFont = document.querySelector('#reg');
+const larFont = document.querySelector('#lar');
+regFont.addEventListener('click', toRegFont);
+larFont.addEventListener('click', toLarFont);
+
+const body = document.querySelector('body');
+const controlsContainer = document.querySelector('.controls-container');
+const springDesign = () => {
+  body.style.backgroundColor = 'lightgreen';
+  body.style.fontFamily = 'Arial'
+  controlsContainer.style.backgroundColor = 'green';
+}
+const summerDesign = () => {
+  body.style.backgroundColor = 'lightyellow';
+  body.style.fontFamily = 'Courier New'
+  controlsContainer.style.backgroundColor = 'orange';
+}
+const spring = document.querySelector('#spring');
+const summer = document.querySelector('#summer');
+spring.addEventListener('click', springDesign);
+summer.addEventListener('click', summerDesign);
+
+
+

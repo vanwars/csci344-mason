@@ -148,7 +148,7 @@ const showCommentAndButtonIfItMakesSense = post => {
 const initPage = async () => {
     // set the token as a global variable 
     // (so that all of your other functions can access it):
-    token = await getAccessToken(rootURL, 'webdev', 'password');
+    token = await getAccessToken(rootURL, 'mason', 'mason_password');
     console.log(token);
     
     // then use the access token provided to access data on the user's behalf

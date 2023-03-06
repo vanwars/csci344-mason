@@ -53,3 +53,11 @@ input:hover {
 main {
     padding: 20px 15vw;
 }
+
+#nav {
+    display: flex;
+    flex-direction: row;
+    column-gap: 15px;
+    align-items: center;
+    list-style-type: none;
+}
