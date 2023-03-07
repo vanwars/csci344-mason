@@ -131,7 +131,7 @@ const postToHTML = (post, i) => {
             <img src="${post.image_url}" alt="">
             <section class="iconsrow">
                 <section id="left">
-                    <button class="buttons" onclick="${post.current_user_like_id ? deleteLike(post) : postLike(post)}"><i class="${post.current_user_like_id ? 'fas fa-heart' : 'far fa-heart'}"></i></button>
+                    <button class="buttons" onclick="${post.current_user_like_id ? `deleteLike(${post.id}, ${post.current_user_like_id})` : `postLike(${post.id})`}"><i class="${post.current_user_like_id ? 'fas fa-heart' : 'far fa-heart'}"></i></button>
                     <button class="buttons"><i class="far fa-comment"></i></button>
                     <button class="buttons"><i class="far fa-paper-plane"></i></button>
                 </section
@@ -192,10 +192,10 @@ const requeryRedraw = async (postId) => {
     targetElementAndReplace(`#post_${postId}`, htmlString);
 }
 
-window.postLike = async (post) => {
+window.postLike = async (postId) => {
     const endpoint = `${rootURL}/api/posts/likes/`;
     const postData = {
-        'post_id': post.id
+        'post_id': postId
     };
     const repsonse = await fetch(endpoint, {
         method: 'POST',
@@ -206,11 +206,11 @@ window.postLike = async (post) => {
         body: JSON.stringify(postData)
     })
     const data = await repsonse.json();
-    requeryRedraw(post.id);
+    requeryRedraw(postId);
 }
 
-window.deleteLike = async (post) => {
-    const endpoint = `${rootURL}/api/posts/likes/${post.current_user_like_id}`;
+window.deleteLike = async (postId, likeId) => {
+    const endpoint = `${rootURL}/api/posts/likes/${likeId}`;
     const response = await fetch(endpoint, {
         method: "DELETE",
         headers: {
@@ -219,7 +219,7 @@ window.deleteLike = async (post) => {
         }
     })
     const data = await response.json();
-    requeryRedraw(post.id);
+    requeryRedraw(postId);
 }
 
 const initPage = async () => {
